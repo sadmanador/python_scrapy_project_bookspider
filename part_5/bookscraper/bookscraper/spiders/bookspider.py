@@ -30,6 +30,7 @@ class BookspiderSpider(scrapy.Spider):
         
         yield {
             "title": response.css('div.product_main h1::text').get(),
+            "imgUrl": response.css('.thumbnail img::attr(src)').get(),
             "url": response.url,
             'product_type': table_row[1].css('td::text').get(),
             'price': response.css('p.price_color::text').get(),
