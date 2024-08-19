@@ -1,4 +1,5 @@
 from itemadapter import ItemAdapter
+from urllib.parse import urljoin
 
 class BookscraperPipeline:
     def process_item(self, item, spider):
@@ -69,9 +70,9 @@ class BookscraperPipeline:
         
         
         # Update 'img_url' field to include the base URL
-        base_url = 'http://books.toscrape.com/'
-        img_url = adapter.get('img_url', '')
-        if img_url:
-            adapter['img_url'] = base_url + img_url.lstrip('.')
+        img_url = adapter.get('img_url')
+        if isinstance(img_url, str):
+            base_url = "http://books.toscrape.com/"
+            adapter['img_url'] = urljoin(base_url, img_url)
         
         return item
