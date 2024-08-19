@@ -1,4 +1,5 @@
 import scrapy
+from bookscraper.items import BookItem
 
 class BookspiderSpider(scrapy.Spider):
     name = "bookspider"
@@ -28,17 +29,22 @@ class BookspiderSpider(scrapy.Spider):
     def parse_book_page(self, response):
         table_row = response.css('table tr')
         
-        yield {
-            "title": response.css('div.product_main h1::text').get(),
-            "url": response.url,
-            'product_type': table_row[1].css('td::text').get(),
-            'price': response.css('p.price_color::text').get(),
-            'price_excl_tax': table_row[2].css('td::text').get(),
-            'price_incl_tax': table_row[3].css('td::text').get(),
-            'tax': table_row[4].css('td::text').get(),
-            'availability': table_row[5].css('td::text').get(),
-            'num_views': table_row[6].css('td::text').get(),
-            'star': response.css('p.star-rating').attrib['class'],
-            'category': response.xpath("//ul[@class='breadcrumb']/li[3]/a/text()").get(),
-            'description': response.xpath("//div[@id='product_description']/following-sibling::p/text()").get(),
-        }
+        
+        book_items = BookItem()
+        book_items['upc']= table_row[0].css('td::text').get()
+        book_items['title']=response.css('div.product_main h1::text').get()
+        book_items['url']= response.url
+        book_items['img_url'] = response.css('.thumbnail img::attr(src)').get()
+        book_items['price']= response.css('p.price_color::text').get()
+        book_items['product_type']= table_row[1].css('td::text').get()
+        book_items['price_excl_tax'] =  table_row[2].css('td::text').get()
+        book_items['price_incl_tax']= table_row[3].css('td::text').get()
+        book_items['tax']= table_row[4].css('td::text').get()
+        book_items['availability']= table_row[5].css('td::text').get()
+        book_items['num_reviews']= table_row[6].css('td::text').get()
+        book_items['stars']= response.css('p.star-rating').attrib['class']
+        book_items['category']= response.xpath("//ul[@class='breadcrumb']/li[3]/a/text()").get()
+        book_items['description']= response.xpath("//div[@id='product_description']/following-sibling::p/text()").get()
+        
+        yield book_items
+        
